@@ -1,14 +1,19 @@
 #include <algorithm>
 #include <iostream>
+#include <valarray>
 #include <vector>
 
 #include "card.h"
 #include "combo_finder.h"
+#include "deck.h"
 
-void Show_table_cards(const std::pmr::vector<Card> &cards_on_table) {
+void show_table_cards(const std::pmr::vector<Card> &cards_on_table, const bool show_ascii) {
     std::cout << "Cards on the table" << std::endl;
-    for (auto card: cards_on_table) {
+    for (const auto card: cards_on_table) {
         OutputCard(card);
+        if (show_ascii) {
+            OutputCardAscii(card);
+        }
     }
 }
 
@@ -19,42 +24,61 @@ bool player_folds() {
     return player_choice == 1;
 }
 
+void show_player_cards(const std::pmr::vector<Card> &player_cards, const bool show_ascii) {
+    std::cout << "Your cards are : " << std::endl;
+    OutputCard(player_cards[0]);
+    if (show_ascii) {
+        OutputCardAscii(player_cards[0]);
+    }
+    OutputCard(player_cards[1]);
+    if (show_ascii) {
+        OutputCardAscii(player_cards[1]);
+    }
+}
+
 int main() {
     srand(time(nullptr));
+    auto deck = Deck();
 
-    const Card player_cards[2] = {Draw(), Draw()};
-    Card enemy_cards[2] = {Draw(), Draw()};
-    std::pmr::vector<Card> cards_on_table = {Draw(), Draw(), Draw()};
+    std::pmr::vector<Card> player_cards = {deck.Draw(), deck.Draw()};
+    std::pmr::vector<Card> table_cards = {deck.Draw(), deck.Draw(), deck.Draw()};
 
-    std::cout << "You have drawn : " << std::endl;
-    OutputCard(player_cards[0]);
-    OutputCard(player_cards[1]);
+    show_player_cards(player_cards, true);
+    show_table_cards(table_cards, true);
 
-    Show_table_cards(cards_on_table);
-
-    std::pmr::vector<Card> board = {
-        player_cards[0], player_cards[1], cards_on_table[0], cards_on_table[1], cards_on_table[2]
-    };
-
-    find_combos(board);
+    find_combos(player_cards, table_cards);
 
     if (player_folds()) {
         return 0;
     }
 
-    cards_on_table.push_back(Draw());
-    Show_table_cards(cards_on_table);
+    table_cards.push_back(deck.Draw());
+    show_player_cards(player_cards, false);
+    show_table_cards(table_cards, false);
 
-    find_combos(board);
+    find_combos(player_cards, table_cards);
 
     if (player_folds()) {
         return 0;
     }
 
-    cards_on_table.push_back(Draw());
-    Show_table_cards(cards_on_table);
+    table_cards.push_back(deck.Draw());
+    show_player_cards(player_cards, false);
+    show_table_cards(table_cards, false);
 
-    find_combos(board);
+    std::pmr::vector<Card> enemy_cards = {deck.Draw(), deck.Draw()};
+    const int player_score = find_combos(player_cards, table_cards);
+    const int enemy_score = find_combos(enemy_cards, table_cards, false);
+
+    std::cout << "enemy hand : " << std::endl;
+    OutputCard(enemy_cards[0]);
+    OutputCard(enemy_cards[1]);
+
+    if (player_score < enemy_score) {
+        std::cout << "the enemy has a better hand ! you loose !" << std::endl;
+    } else {
+        std::cout << "you have a better hand ! you win !";
+    }
 
     return 0;
 }

@@ -12,6 +12,6 @@ std::map<int, int> find_duplicates(const std::pmr::vector<Card> &board);
 
 bool is_royal_flush(const std::pmr::vector<Card> &board);
 
-void find_combos(std::pmr::vector<Card> &board);
+int find_combos(std::pmr::vector<Card> &player_cards, std::pmr::vector<Card> &table_cards, bool console_output = true);
 
 #endif //POKER_COMBO_FINDER_H

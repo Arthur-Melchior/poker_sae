@@ -9,13 +9,16 @@ enum Suit {
     Club,
 };
 
-struct Card {
+class Card {
+public:
+    Card(Suit suit, int value);
     Suit suit;
     int value;
 };
 
-Card Draw();
-
 void OutputCard(Card card);
+
+void OutputCardAscii(Card card);
+
 
 #endif //POKER_CARD_H

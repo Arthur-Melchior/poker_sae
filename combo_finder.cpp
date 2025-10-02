@@ -11,8 +11,8 @@ bool is_flush(const std::pmr::vector<Card> &board) {
     int clubs = 0;
     int diamonds = 0;
 
-    for (auto card: board) {
-        switch (card.suit) {
+    for (auto [suit, value]: board) {
+        switch (suit) {
             case Heart:
                 ++hearts;
                 break;
@@ -38,7 +38,9 @@ bool is_flush(const std::pmr::vector<Card> &board) {
 bool is_straight(const std::pmr::vector<Card> &board) {
     int series = 0;
     for (int i = 0; i < board.size() - 1; ++i) {
-        if (board[i + 1].value == board[i].value + 1) {
+        if (board[i].value == 13 && board[i + 1].value == 1) {
+            ++series;
+        } else if (board[i + 1].value == board[i].value + 1) {
             ++series;
         } else {
             series = 0;
@@ -89,14 +91,24 @@ int is_royal_flush(const std::pmr::vector<Card> &board) {
     return true;
 }
 
-void find_combos(std::pmr::vector<Card> &board) {
+int find_combos(std::pmr::vector<Card> &player_cards, std::pmr::vector<Card> &table_cards, bool console_output = true) {
+    std::pmr::vector<Card> board;
+
+    for (auto player_card: player_cards) {
+        board.push_back(player_card);
+    }
+
+    for (auto table_card: table_cards) {
+        board.push_back(table_card);
+    }
+
     //all algorithms assume the board is sorted
     std::ranges::sort(board, [](const Card a, const Card b) {
         return a.value < b.value;
     });
 
-    auto flush = is_flush(board);
-    auto straight = is_straight(board);
+    const auto flush = is_flush(board);
+    const auto straight = is_straight(board);
     bool royal_flush = false;
 
     if (flush && straight) {
@@ -116,25 +128,57 @@ void find_combos(std::pmr::vector<Card> &board) {
     });
 
 
-    if (royal_flush) {
-        std::cout << "you have a royal flush !";
-    } else if (flush && straight) {
-        std::cout << "you have a straight flush !" << std::endl;
-    } else if (four_of_a_kind) {
-        std::cout << "you have a four of a kind !" << std::endl;
-    } else if (three_of_a_kind && pairs) {
-        std::cout << "you have a full house !" << std::endl;
-    } else if (flush) {
-        std::cout << "you have a flush !" << std::endl;
-    } else if (straight) {
-        std::cout << "you have a straight !" << std::endl;
-    } else if (three_of_a_kind) {
-        std::cout << "you have a three of a kind !" << std::endl;
-    } else if (pairs == 2) {
-        std::cout << "you have two pairs !" << std::endl;
-    } else if (pairs) {
-        std::cout << "you have a pair !" << std::endl;
-    } else {
-        std::cout << "you don't have any combo" << std::endl;
+    if (console_output) {
+        if (royal_flush) {
+            std::cout << "you have a royal flush !";
+        } else if (flush && straight) {
+            std::cout << "you have a straight flush !" << std::endl;
+        } else if (four_of_a_kind) {
+            std::cout << "you have a four of a kind !" << std::endl;
+        } else if (three_of_a_kind && pairs) {
+            std::cout << "you have a full house !" << std::endl;
+        } else if (flush) {
+            std::cout << "you have a flush !" << std::endl;
+        } else if (straight) {
+            std::cout << "you have a straight !" << std::endl;
+        } else if (three_of_a_kind) {
+            std::cout << "you have a three of a kind !" << std::endl;
+        } else if (pairs == 2) {
+            std::cout << "you have two pairs !" << std::endl;
+        } else if (pairs) {
+            std::cout << "you have a pair !" << std::endl;
+        } else {
+            std::cout << "you don't have any combo" << std::endl;
+        }
     }
+
+    if (royal_flush) {
+        return 50;
+    }
+    if (flush && straight) {
+        return 40;
+    }
+    if (four_of_a_kind) {
+        return 30;
+    }
+    if (three_of_a_kind && pairs) {
+        return 25;
+    }
+    if (flush) {
+        return 20;
+    }
+    if (straight) {
+        return 15;
+    }
+    if (three_of_a_kind) {
+        return 10;
+    }
+    if (pairs == 2) {
+        return 5;
+    }
+    if (pairs) {
+        return 1;
+    }
+
+    return 0;
 }

@@ -8,4 +8,7 @@ add_executable(poker main.cpp
         combo_finder.h
         card.cpp
         combo_finder.cpp
+        player.h
+        deck.h
+        deck.cpp
 )
