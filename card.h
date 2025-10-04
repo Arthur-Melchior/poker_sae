@@ -1,6 +1,8 @@
 #ifndef POKER_CARD_H
 #define POKER_CARD_H
 #pragma once
+#include <string>
+#include <vector>
 
 enum Suit {
     Heart,
@@ -18,7 +20,9 @@ public:
 
 void OutputCard(Card card);
 
-void OutputCardAscii(Card card);
+void OutputAsciiCards(std::pmr::vector<Card> cards);
+
+std::pmr::string GetCardAscii(Card card);
 
 
 #endif //POKER_CARD_H

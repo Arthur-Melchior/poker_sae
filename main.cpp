@@ -1,19 +1,21 @@
 #include <algorithm>
 #include <iostream>
+#include <memory_resource>
 #include <valarray>
 #include <vector>
+#include <sstream>
 
 #include "card.h"
 #include "combo_finder.h"
 #include "deck.h"
 
-void show_table_cards(const std::pmr::vector<Card> &cards_on_table, const bool show_ascii) {
+void show_table_cards(const std::pmr::vector<Card> &table_cards, const bool show_ascii) {
     std::cout << "Cards on the table" << std::endl;
-    for (const auto card: cards_on_table) {
+    for (const auto card: table_cards) {
         OutputCard(card);
-        if (show_ascii) {
-            OutputCardAscii(card);
-        }
+    }
+    if (show_ascii) {
+        OutputAsciiCards(table_cards);
     }
 }
 
@@ -27,14 +29,12 @@ bool player_folds() {
 void show_player_cards(const std::pmr::vector<Card> &player_cards, const bool show_ascii) {
     std::cout << "Your cards are : " << std::endl;
     OutputCard(player_cards[0]);
-    if (show_ascii) {
-        OutputCardAscii(player_cards[0]);
-    }
     OutputCard(player_cards[1]);
     if (show_ascii) {
-        OutputCardAscii(player_cards[1]);
+        OutputAsciiCards(player_cards);
     }
 }
+
 
 int main() {
     srand(time(nullptr));
@@ -53,8 +53,8 @@ int main() {
     }
 
     table_cards.push_back(deck.Draw());
-    show_player_cards(player_cards, false);
-    show_table_cards(table_cards, false);
+    show_player_cards(player_cards, true);
+    show_table_cards(table_cards, true);
 
     find_combos(player_cards, table_cards);
 
@@ -63,8 +63,8 @@ int main() {
     }
 
     table_cards.push_back(deck.Draw());
-    show_player_cards(player_cards, false);
-    show_table_cards(table_cards, false);
+    show_player_cards(player_cards, true);
+    show_table_cards(table_cards, true);
 
     std::pmr::vector<Card> enemy_cards = {deck.Draw(), deck.Draw()};
     const int player_score = find_combos(player_cards, table_cards);
@@ -73,6 +73,7 @@ int main() {
     std::cout << "enemy hand : " << std::endl;
     OutputCard(enemy_cards[0]);
     OutputCard(enemy_cards[1]);
+    OutputAsciiCards(enemy_cards);
 
     if (player_score < enemy_score) {
         std::cout << "the enemy has a better hand ! you loose !" << std::endl;
